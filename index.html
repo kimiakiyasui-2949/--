@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photographer<br> Ustubo Kento</title>
+<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Oleo+Script:wght@400;700&family=Playfair+Display:wght@600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#000;color:#fff;line-height:1.6}
+body.intro-active{overflow:hidden}
+body.intro-active header,
+body.intro-active section,
+body.intro-active footer,
+body.intro-active .lightbox{opacity:0;visibility:hidden}
+img{width:100%;display:block}
+.grid img,.tours img{cursor:pointer}
+.grid img,.tours img{opacity:1;transform:none;transition:none}
+.grid img.in-view,.tours img.in-view{opacity:1;transform:none}
+
+header{position:fixed;width:100%;top:0;left:0;background:rgba(0,0,0,0.6);padding:15px 30px;z-index:10;display:flex;align-items:center;justify-content:space-between}
+header h1{font-family:'Oleo Script',system-ui;font-size:clamp(22px,2.8vw,30px);font-weight:700;letter-spacing:.02em;line-height:1.05;white-space:nowrap}
+.menu-wrapper{position:relative}
+.menu-toggle{position:relative;z-index:12;width:46px;height:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:transparent;border:1px solid rgba(255,255,255,0.45);cursor:pointer}
+.menu-toggle span{width:20px;height:2px;background:#fff}
+.menu{position:fixed;top:0;left:0;width:100%;height:66vh;padding:96px 30px 30px;background:rgba(255,255,255,0.82);backdrop-filter:blur(6px);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-100%);transform-origin:top;transition:opacity .35s ease,transform .35s ease,visibility .35s ease;z-index:11}
+.menu.open{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0)}
+.menu a{display:block;padding:14px 0;color:#000;text-decoration:none;font-size:20px;border-bottom:1px solid rgba(0,0,0,0.12);background-image:linear-gradient(#c40018,#c40018);background-repeat:no-repeat;background-size:0 2px;background-position:left calc(100% - 6px);transition:background-size .2s ease,color .2s ease}
+.menu a:hover,.menu a:focus-visible{color:#c40018;background-size:100% 2px}
+
+.hero{position:relative;height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden}
+.hero::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.35);z-index:1}
+.hero-slide{position:absolute;inset:0;background-position:center;background-size:cover;background-repeat:no-repeat;opacity:0;animation:dissolve 12s infinite ease-in-out}
+.hero-slide:nth-child(1){background-image:url('https://images.unsplash.com/photo-1501785888041-af3ef285b470');animation-delay:0s}
+.hero-slide:nth-child(2){background-image:url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee');animation-delay:4s}
+.hero-slide:nth-child(3){background-image:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e');animation-delay:8s}
+.hero-content{position:relative;z-index:2}
+.hero h2{font-size:48px;font-family:'Playfair Display',serif}
+.hero p{margin-top:10px}
+.hero button{margin-top:20px;padding:12px 30px;border:none;background:#fff;color:#000;cursor:pointer}
+
+.section{padding:80px 20px;max-width:1200px;margin:auto}
+.gallery-section{min-height:100vh;display:flex;flex-direction:column;justify-content:center}
+.grid{display:grid;grid-template-columns:1fr;gap:30px}
+.card{background:#111;padding:10px}
+.card h3{margin-top:10px}
+.card button{margin-top:10px;padding:10px;background:#fff;color:#000;border:none}
+.card a{display:inline-block;margin-top:10px;padding:10px;background:#fff;color:#000;border:none;text-decoration:none}
+
+.tours{display:grid;grid-template-columns:1fr;gap:20px}
+.tour{position:relative}
+.tour span{position:absolute;bottom:10px;left:10px;font-weight:bold}
+
+footer{text-align:center;padding:40px;background:#111}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;padding:0;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s ease;z-index:30}
+.lightbox.open{opacity:1;visibility:visible;pointer-events:auto}
+.lightbox img{width:100vw;height:auto;max-width:none;max-height:100vh;object-fit:contain}
+.lightbox img.portrait{width:auto;height:100vh;max-width:100vw;max-height:none}
+.lightbox-close,.lightbox-prev,.lightbox-next{position:absolute;border:none;background:rgba(255,255,255,0.18);color:#fff;cursor:pointer}
+.lightbox-close{top:24px;right:24px;width:48px;height:48px;font-size:28px}
+.lightbox-prev,.lightbox-next{top:50%;transform:translateY(-50%);width:52px;height:52px;font-size:28px}
+.lightbox-prev{left:24px}
+.lightbox-next{right:24px}
+.intro-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .8s ease;z-index:40}
+.intro-overlay.show{opacity:1;visibility:visible;pointer-events:auto}
+.intro-title-wrap{position:relative;display:inline-block;max-width:calc(100vw - 48px);padding:0 24px;overflow:hidden}
+.intro-title-wrap::after{content:'';position:absolute;inset:0;background:#000;transform:translateX(0)}
+.intro-title{display:block;color:#fff;font-family:'Amatic SC',cursive;font-size:clamp(56px,9vw,120px);font-weight:700;line-height:1.1;text-align:center;letter-spacing:.08em;white-space:nowrap;opacity:1}
+.intro-overlay.show .intro-title-wrap::after{animation:introReveal 2.4s ease .2s forwards}
+
+@keyframes dissolve{
+0%{opacity:0}
+10%{opacity:1}
+24%{opacity:1}
+42%{opacity:0}
+100%{opacity:0}
+}
+
+@keyframes introReveal{
+0%{transform:translateX(0)}
+100%{transform:translateX(100%)}
+}
+
+/* PC */
+@media(min-width:768px){
+.hero h2{font-size:64px}
+.grid{grid-template-columns:repeat(3,1fr)}
+.tours{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+
+<body>
+<header>
+<h1>Photographer Ustubo Kento</h1>
+<div class="menu-wrapper">
+<button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu" aria-label="Open menu">
+<span></span>
+<span></span>
+<span></span>
+</button>
+<nav class="menu" id="site-menu">
+<a href="index.html">Home</a>
+<a href="salt-desert.html">Work</a>
+<a href="beauty.html">Beauty</a>
+<a href="about.html">About</a>
+<a href="contact.html">Contact</a>
+</nav>
+</div>
+</header>
+
+<section class="hero">
+<div class="hero-slide"></div>
+<div class="hero-slide"></div>
+<div class="hero-slide"></div>
+<div class="hero-content">
+<h2>IGNITING PASSION</h2>
+<p>Adventure Photography</p>
+</div>
+</section>
+
+<section class="section gallery-section">
+<h2>GALLERY</h2>
+<div class="grid">
+<div class="card">
+<img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee">
+<h3>work</h3>
+<a href="salt-desert.html">View</a>
+</div>
+<div class="card">
+<img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470">
+<h3>Beauty</h3>
+<a href="beauty.html">View</a>
+</div>
+
+</div>
+</section>
+
+<section class="section">
+<h2>FEATURE</h2>
+<div class="tours">
+<div class="tour">
+<img src="https://images.unsplash.com/photo-1519681393784-d120267933ba">
+<span>Africa Safari</span>
+</div>
+<div class="tour">
+<img src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e">
+<span>Winter Forest</span>
+</div>
+<div class="tour">
+<img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e">
+<span>Ocean View</span>
+</div>
+</div>
+</section>
+
+<section class="section">
+<h2>TESTIMONIALS</h2>
+<p>"Amazing experience!"</p>
+<p>"Best photography tour ever."</p>
+</section>
+
+<footer>
+<p>© 2026　Kimiaki Yasui</p>
+</footer>
+
+<div class="intro-overlay" aria-hidden="true">
+<div class="intro-title-wrap">
+<div class="intro-title">Ustubo Kento</div>
+</div>
+</div>
+
+<div class="lightbox" aria-hidden="true">
+<button class="lightbox-close" type="button" aria-label="Close image viewer">×</button>
+<button class="lightbox-prev" type="button" aria-label="Previous image">‹</button>
+<img class="lightbox-image" src="" alt="Expanded photograph">
+<button class="lightbox-next" type="button" aria-label="Next image">›</button>
+</div>
+
+<script>
+const menuToggle = document.querySelector('.menu-toggle');
+const menu = document.querySelector('.menu');
+const galleryImages = Array.from(document.querySelectorAll('.grid img, .tours img'));
+const lightbox = document.querySelector('.lightbox');
+const lightboxImage = document.querySelector('.lightbox-image');
+const lightboxClose = document.querySelector('.lightbox-close');
+const lightboxPrev = document.querySelector('.lightbox-prev');
+const lightboxNext = document.querySelector('.lightbox-next');
+const introOverlay = document.querySelector('.intro-overlay');
+const introTitleWrap = document.querySelector('.intro-title-wrap');
+let currentImageIndex = 0;
+
+const updateLightboxOrientation = () => {
+lightboxImage.classList.toggle('portrait', lightboxImage.naturalHeight > lightboxImage.naturalWidth);
+};
+
+lightboxImage.addEventListener('load', updateLightboxOrientation);
+
+const playIntro = () => {
+document.body.classList.add('intro-active');
+introTitleWrap.style.animation = 'none';
+void introTitleWrap.offsetWidth;
+introTitleWrap.style.animation = '';
+window.requestAnimationFrame(() => {
+introOverlay.classList.add('show');
+introOverlay.setAttribute('aria-hidden', 'false');
+});
+window.setTimeout(() => {
+introOverlay.classList.remove('show');
+introOverlay.setAttribute('aria-hidden', 'true');
+document.body.classList.remove('intro-active');
+}, 3600);
+};
+
+playIntro();
+
+menuToggle.addEventListener('click', () => {
+const isOpen = menu.classList.toggle('open');
+menuToggle.setAttribute('aria-expanded', String(isOpen));
+});
+
+document.addEventListener('click', (event) => {
+if (!event.target.closest('.menu-wrapper')) {
+menu.classList.remove('open');
+menuToggle.setAttribute('aria-expanded', 'false');
+}
+});
+
+document.addEventListener('keydown', (event) => {
+if (event.key === 'Escape') {
+menu.classList.remove('open');
+menuToggle.setAttribute('aria-expanded', 'false');
+}
+});
+
+const renderLightboxImage = () => {
+const activeImage = galleryImages[currentImageIndex];
+lightboxImage.src = activeImage.src;
+lightboxImage.alt = activeImage.alt || 'Expanded photograph';
+};
+
+const openLightbox = (index) => {
+currentImageIndex = index;
+renderLightboxImage();
+lightbox.classList.add('open');
+lightbox.setAttribute('aria-hidden', 'false');
+};
+
+const closeLightbox = () => {
+lightbox.classList.remove('open');
+lightbox.setAttribute('aria-hidden', 'true');
+};
+
+const showNextImage = () => {
+currentImageIndex = (currentImageIndex + 1) % galleryImages.length;
+renderLightboxImage();
+};
+
+const showPrevImage = () => {
+currentImageIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
+renderLightboxImage();
+};
+
+galleryImages.forEach((image, index) => {
+image.addEventListener('click', () => openLightbox(index));
+});
+
+lightboxClose.addEventListener('click', closeLightbox);
+lightboxNext.addEventListener('click', showNextImage);
+lightboxPrev.addEventListener('click', showPrevImage);
+
+lightbox.addEventListener('click', (event) => {
+if (event.target === lightbox) {
+closeLightbox();
+}
+});
+
+document.addEventListener('keydown', (event) => {
+if (!lightbox.classList.contains('open')) {
+return;
+}
+if (event.key === 'ArrowRight') {
+showNextImage();
+}
+if (event.key === 'ArrowLeft') {
+showPrevImage();
+}
+if (event.key === 'Escape') {
+closeLightbox();
+}
+});
+</script>
+
+</body>
+</html>
